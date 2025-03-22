@@ -1,5 +1,5 @@
 import time
-from graphics import Cell, Window
+from cell import Cell
 
 class Maze:
     def __init__(
@@ -11,6 +11,7 @@ class Maze:
             cell_size_x,
             cell_size_y,
             win=None,
+            seed=None,
         ):
         self.x1 = x1
         self.y1 = y1
@@ -20,10 +21,12 @@ class Maze:
         self.cell_size_y = cell_size_y
         self._win = win
         self._cells = []
+        self._seed = seed
         # Generate the maze
         self._create_cells()
         # Create the entrance and the exit
         self._break_entrance_and_exit()
+        self._break_walls_r(0,0)
 
     def _create_cells(self):
         for _ in range(self.num_cols):
@@ -72,3 +75,29 @@ class Maze:
         exit = self._cells[self.num_cols - 1][self.num_rows - 1]
         exit.has_bottom_wall = False
         self._draw_cell(self.num_cols-1, self.num_rows-1)
+    
+    def _break_walls_r(self, i, j):
+        # DFS algo which breaks walls as it goes
+        # first tags the cell as visited
+        self._cells[i][j].visited = True
+        # Stores the i and j values which have already been visited
+        to_visit = []
+        # visiting = True
+        adj_neighbors = {
+            "top": (0, -1), 
+            "bottom": (0, 1), 
+            "left": (-1, 0), 
+            "right": (1, 0),
+            }
+        list = []
+        for key in adj_neighbors:
+            if i + adj_neighbors[key][0] < 0 \
+                or i + adj_neighbors[key][0] > (self.num_rows - 1)\
+                or j + adj_neighbors[key][1] < 0 \
+                or j + adj_neighbors[key][1] > (self.num_cols - 1):
+                    print("out of bounds")
+            else:
+                neighbor = (i + adj_neighbors[key][0], j + adj_neighbors[key][1])
+                list.append(neighbor)
+        print(list)
+                
