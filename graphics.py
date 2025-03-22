@@ -45,7 +45,7 @@ class Line:
 class Cell:
     # Class which defines a cell. 
     # It should know which walls it has, where it exists on the canvas in x/y coordinates, and access to the window so that it can draw itself
-    def __init__(self, window):
+    def __init__(self, window=None):
         # creates public methods which can be altered once a cell is create for existence of each wall
         self.has_left_wall = True
         self.has_right_wall = True
@@ -65,22 +65,30 @@ class Cell:
         self._x2 = x2
         self._y1 = y1
         self._y2 = y2
+        # create all the lines for a given cell
+        left_wall = Line(Point(x1, y1), Point(x1, y2))
+        right_wall = Line(Point(x2, y1), Point(x2, y2))
+        top_wall = Line(Point(x1, y1), Point(x2, y1))
+        bottom_wall = Line(Point(x1, y2), Point(x2, y2))
         # based on if the cell continues a left_wall, we draw or don't draw. repeats for each 
         if self.has_left_wall:
-            left_wall = Line(Point(x1, y1), Point(x1, y2))
             self._win.draw(left_wall)
+        else:
+            self._win.draw(left_wall, fill_color="white")
 
         if self.has_right_wall:
-            right_wall = Line(Point(x2, y1), Point(x2, y2))
             self._win.draw(right_wall)
+        else:
+            self._win.draw(right_wall, fill_color="white")
 
         if self.has_top_wall:
-            top_wall = Line(Point(x1, y1), Point(x2, y1))
             self._win.draw(top_wall)
-
+        else:
+            self._win.draw(top_wall, fill_color="white")
         if self.has_bottom_wall:
-            bottom_wall = Line(Point(x1, y2), Point(x2, y2))
             self._win.draw(bottom_wall)
+        else:
+            self._win.draw(bottom_wall, fill_color="white")
 
     # Draws a line from the center of one cell to another. color of the line changes depending on if undo is true or false
     # self is the original/starting cell and to_cell is the cell where the line will end up

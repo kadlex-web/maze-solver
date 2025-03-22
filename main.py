@@ -2,8 +2,8 @@ from graphics import Window, Line, Point, Cell
 from maze import Maze
 
 def main():
-    num_rows = 12
-    num_cols = 16
+    num_rows = 4
+    num_cols = 4
     margin = 50
     screen_x = 800
     screen_y = 600
