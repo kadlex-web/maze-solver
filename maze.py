@@ -1,4 +1,5 @@
 import time
+import random
 from cell import Cell
 
 class Maze:
@@ -22,10 +23,11 @@ class Maze:
         self._win = win
         self._cells = []
         self._seed = seed
-        # Generate the maze
+        # Generate the cell structure of the maze
         self._create_cells()
         # Create the entrance and the exit
         self._break_entrance_and_exit()
+        # build a maze!
         self._break_walls_r(0,0)
 
     def _create_cells(self):
@@ -77,27 +79,61 @@ class Maze:
         self._draw_cell(self.num_cols-1, self.num_rows-1)
     
     def _break_walls_r(self, i, j):
-        # DFS algo which breaks walls as it goes
-        # first tags the cell as visited
-        self._cells[i][j].visited = True
-        # Stores the i and j values which have already been visited
-        to_visit = []
-        # visiting = True
+        print(f'im in ({i},{j})')
+        # Marks the current cell as visited
+        self._cells[i][j]._visited = True
+        visiting = True
         adj_neighbors = {
             "top": (0, -1), 
             "bottom": (0, 1), 
             "left": (-1, 0), 
             "right": (1, 0),
             }
-        list = []
-        for key in adj_neighbors:
-            if i + adj_neighbors[key][0] < 0 \
-                or i + adj_neighbors[key][0] > (self.num_rows - 1)\
-                or j + adj_neighbors[key][1] < 0 \
-                or j + adj_neighbors[key][1] > (self.num_cols - 1):
-                    print("out of bounds")
+        # create a to_visit dict which stores possible neighbors that can be visited
+        while visiting:
+            to_visit = {}
+            '''The for loop helps build out a list of neighbors which can be visited - could be written as a function block for cleaner code in this function'''
+            # use the adjacent neighbors dict to check if a neighbor actually exists
+            for key in adj_neighbors:
+                if i + adj_neighbors[key][0] < 0 \
+                    or i + adj_neighbors[key][0] > (self.num_rows - 1)\
+                    or j + adj_neighbors[key][1] < 0 \
+                    or j + adj_neighbors[key][1] > (self.num_cols - 1):
+                        print("out of bounds")
+                # If the neighbor exists -- store its coordinates and create a reference to that cell
+                else:
+                    neighbor_coordinates = (i + adj_neighbors[key][0], j + adj_neighbors[key][1])
+                    neighbor_cell = self._cells[neighbor_coordinates[0]][neighbor_coordinates[1]]
+                    # If the cell hasn't been visited before -- we can add it to a list of neighbors which can be visited from this cell
+                    if neighbor_cell._visited == False:
+                        to_visit[key] = {
+                            "cell" : neighbor_cell,
+                            "coordinates" : neighbor_coordinates,
+                        }
+            # If the to_visit dict has values selects a random one and recursively calls break walls
+            print(to_visit)
+            if len(to_visit) > 0:
+                # Picking a random direction
+                n = random.randrange(len(to_visit))
+                next = list(to_visit)[n]
+                # breaking the wall
+                if next == "top":
+                    print('breaking top wall')
+                    to_visit[next]["cell"].has_top_wall == False
+                elif next == "bottom":
+                    print('breaking bottom wall')
+                    to_visit[next]["cell"].has_bottom_wall == False
+                elif next == "left":
+                    print('breaking left wall')
+                    to_visit[next]["cell"].has_left_wall == False
+                elif next == "right":
+                    print('breaking right wall')
+                    to_visit[next]["cell"].has_right_wall == False
+                print(f'moving to {next}: {to_visit[next]["coordinates"]}')
+                self._break_walls_r(to_visit[next]["coordinates"][0], to_visit[next]["coordinates"][1])
+
             else:
-                neighbor = (i + adj_neighbors[key][0], j + adj_neighbors[key][1])
-                list.append(neighbor)
-        print(list)
-                
+                print("No unvisited neighbors -- reversing course")
+                # Draws the current cell and exits the current iteration of the loop
+                self._draw_cell(i, j)
+                return
